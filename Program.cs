@@ -4,12 +4,13 @@ using LibraryManagementSystem.Repositories.Implementations;
 using LibraryManagementSystem.Services.Interfaces;
 using LibraryManagementSystem.Services.Implementations;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models; // For Swagger configuration
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add DbContext - using InMemory for now (easy for practice)
+// Add DbContext - using SQL Server
 builder.Services.AddDbContext<LibraryDbContext>(options =>
-    options.UseInMemoryDatabase("LibraryDb")); // <-- no need for real SQL now
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Add Repository Layer
 builder.Services.AddScoped<IAuthorRepository, AuthorRepository>();
@@ -22,9 +23,9 @@ builder.Services.AddScoped<IBookService, BookService>();
 // Add controllers
 builder.Services.AddControllers();
 
-// Add Swagger/OpenAPI (optional now, but useful later)
+// Add Swagger/OpenAPI
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(); // You might configure this further later
 
 var app = builder.Build();
 
