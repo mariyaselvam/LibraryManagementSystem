@@ -1,0 +1,8 @@
+C:\Users\anthu\Downloads\LibraryManagementSystem\obj\Debug\net9.0\LibraryManagementSystem.csproj.AssemblyReference.cache
+C:\Users\anthu\Downloads\LibraryManagementSystem\obj\Debug\net9.0\LibraryManagementSystem.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\anthu\Downloads\LibraryManagementSystem\obj\Debug\net9.0\LibraryManagementSystem.AssemblyInfoInputs.cache
+C:\Users\anthu\Downloads\LibraryManagementSystem\obj\Debug\net9.0\LibraryManagementSystem.AssemblyInfo.cs
+C:\Users\anthu\Downloads\LibraryManagementSystem\obj\Debug\net9.0\LibraryManagementSystem.csproj.CoreCompileInputs.cache
+C:\Users\anthu\Downloads\LibraryManagementSystem\obj\Debug\net9.0\LibraryManagementSystem.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\anthu\Downloads\LibraryManagementSystem\obj\Debug\net9.0\LibraryManagementSystem.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\anthu\Downloads\LibraryManagementSystem\obj\Debug\net9.0\LibraryManagementSystem.sourcelink.json

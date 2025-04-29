@@ -1,13 +1,16 @@
-using LibraryManagementSystem.Models;
+// Services/Interfaces/IBookService.cs
+using LibraryManagementSystem.DTOs.Book;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
-namespace LibraryManagementSystem.Repositories.Interfaces
+namespace LibraryManagementSystem.Services.Interfaces
 {
-    public interface IBookRepository
+    public interface IBookService
     {
-        Task<IEnumerable<Book>> GetAllAsync();
-        Task<Book?> GetByIdAsync(int id);
-        Task<Book> AddAsync(Book book);
-        Task<Book?> UpdateAsync(Book book);
-        Task<bool> DeleteAsync(int id);
+        Task<IEnumerable<BookResponseDTO>> GetAllBooksAsync();
+        Task<BookResponseDTO?> GetBookByIdAsync(int id);
+        Task<BookResponseDTO> CreateBookAsync(BookCreateDTO bookCreateDTO);
+        Task<BookResponseDTO?> UpdateBookAsync(int id, BookUpdateDTO bookUpdateDTO);
+        Task<bool> DeleteBookAsync(int id);
     }
 }
