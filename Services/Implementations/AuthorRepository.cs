@@ -1,5 +1,4 @@
 using LibraryManagementSystem.Data;
-using LibraryManagementSystem.Models;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 

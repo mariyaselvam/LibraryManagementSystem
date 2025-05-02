@@ -3,7 +3,6 @@ using LibraryManagementSystem.DTOs.Author;
 using LibraryManagementSystem.DTOs.Book;
 using LibraryManagementSystem.Models;
 
-
 namespace LibraryManagementSystem.Helpers
 {
     public class MappingProfile : Profile
@@ -11,14 +10,23 @@ namespace LibraryManagementSystem.Helpers
         public MappingProfile()
         {
             // Author mappings
-            CreateMap<Author, AuthorDTO>();
-            CreateMap<AuthorCreateDTO, Author>();
-            CreateMap<AuthorUpdateDTO, Author>();
+            CreateMap<Author, AuthorDto>(); // Mapping Author to AuthorDto
+            CreateMap<AuthorCreateDTO, Author>(); // Mapping AuthorCreateDTO to Author
+            CreateMap<AuthorUpdateDTO, Author>(); // Mapping AuthorUpdateDTO to Author
 
             // Book mappings
-            CreateMap<Book, BookResponseDTO>();
-            CreateMap<BookCreateDTO, Book>();
-            CreateMap<BookUpdateDTO, Book>();
+            CreateMap<Book, BookResponseDTO>()
+                .ForMember(dest => dest.AuthorName, opt => opt.MapFrom(src => src.Author.Name)); // Custom mapping for AuthorName
+
+            CreateMap<BorrowRecord, BorrowReadDto>()
+                .ForMember(dest => dest.BookTitle, opt => opt.MapFrom(src => src.Book.Title));
+
+
+            CreateMap<BookCreateDTO, Book>(); // Mapping BookCreateDTO to Book
+            CreateMap<BookUpdateDTO, Book>(); // Mapping BookUpdateDTO to Book
+            CreateMap<BorrowCreateDto, BorrowRecord>();
+
+
         }
     }
 }

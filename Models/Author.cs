@@ -1,10 +1,11 @@
-namespace LibraryManagementSystem.Models
+using LibraryManagementSystem.Models;
+using System.Text.Json.Serialization;
+
+public class Author
 {
-    public class Author
-    {
-        public int Id { get; set; }
-        public string Name { get; set; }
-        public DateTime DateOfBirth { get; set; }
-        public ICollection<Book> Books { get; set; }
-    }
+    public int Id { get; set; }
+    public string Name { get; set; }
+
+    [JsonIgnore]
+    public List<Book> Books { get; set; } // Ignore this property during serialization
 }

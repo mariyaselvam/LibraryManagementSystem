@@ -1,8 +1,8 @@
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using LibraryManagementSystem.DTOs.Author;
-using LibraryManagementSystem.Models;
 using Microsoft.EntityFrameworkCore;
+using AutoMapper;
 
 namespace LibraryManagementSystem.Controllers
 {
@@ -11,18 +11,23 @@ namespace LibraryManagementSystem.Controllers
     public class AuthorsController : ControllerBase
     {
         private readonly IAuthorRepository _authorRepository;
-        public AuthorsController(IAuthorRepository authorRepository)
+        private readonly IMapper _mapper;
+
+        public AuthorsController(IAuthorRepository authorRepository, IMapper mapper)
         {
             _authorRepository = authorRepository;
+            _mapper = mapper;
         }
 
+        // Get all authors
         [HttpGet]
         public async Task<IActionResult> GetAllAuthors()
         {
             try
             {
                 var authors = await _authorRepository.GetAllAsync();
-                return Ok(authors);
+                var authorDtos = _mapper.Map<IEnumerable<AuthorDto>>(authors); // Mapping Author to AuthorDto
+                return Ok(authorDtos);
             }
             catch (DbUpdateException ex)
             {
@@ -30,6 +35,7 @@ namespace LibraryManagementSystem.Controllers
             }
         }
 
+        // Create a new author
         [HttpPost]
         public async Task<IActionResult> CreateAuthor([FromBody] AuthorCreateDTO authorCreateDTO)
         {
@@ -37,16 +43,13 @@ namespace LibraryManagementSystem.Controllers
             {
                 return BadRequest(ModelState);  // Return validation errors
             }
+
             try
             {
-                var author = new Author
-                {
-                    Name = authorCreateDTO.Name,
-                    DateOfBirth = authorCreateDTO.DateOfBirth
-                };
-
+                var author = _mapper.Map<Author>(authorCreateDTO);  // Map CreateDTO to Author
                 var createdAuthor = await _authorRepository.AddAsync(author);
-                return CreatedAtAction(nameof(GetById), new { id = createdAuthor.Id }, createdAuthor);
+                var createdAuthorDto = _mapper.Map<AuthorDto>(createdAuthor);  // Map the created author to AuthorDto
+                return CreatedAtAction(nameof(GetById), new { id = createdAuthorDto.Id }, createdAuthorDto);
             }
             catch (DbUpdateException ex)
             {
@@ -54,6 +57,7 @@ namespace LibraryManagementSystem.Controllers
             }
         }
 
+        // Get author by Id
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -64,7 +68,9 @@ namespace LibraryManagementSystem.Controllers
                 {
                     return NotFound();  // Return 404 if author doesn't exist
                 }
-                return Ok(author);
+
+                var authorDto = _mapper.Map<AuthorDto>(author); // Map Author to AuthorDto
+                return Ok(authorDto);
             }
             catch (DbUpdateException ex)
             {
@@ -72,6 +78,7 @@ namespace LibraryManagementSystem.Controllers
             }
         }
 
+        // Update an existing author
         [HttpPut("{id}")]
         public async Task<IActionResult> UpdateAuthor(int id, [FromBody] AuthorUpdateDTO authorUpdateDTO)
         {
@@ -88,11 +95,10 @@ namespace LibraryManagementSystem.Controllers
                     return NotFound();  // Return 404 if author doesn't exist
                 }
 
-                existingAuthor.Name = authorUpdateDTO.Name;
-                existingAuthor.DateOfBirth = authorUpdateDTO.DateOfBirth;
-
+                _mapper.Map(authorUpdateDTO, existingAuthor); // Map AuthorUpdateDTO to existing Author
                 var updatedAuthor = await _authorRepository.UpdateAsync(existingAuthor);
-                return Ok(updatedAuthor);
+                var updatedAuthorDto = _mapper.Map<AuthorDto>(updatedAuthor); // Map the updated author to AuthorDto
+                return Ok(updatedAuthorDto);
             }
             catch (DbUpdateException ex)
             {
@@ -100,6 +106,7 @@ namespace LibraryManagementSystem.Controllers
             }
         }
 
+        // Delete an author
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAuthor(int id)
         {
