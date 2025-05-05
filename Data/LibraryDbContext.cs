@@ -1,3 +1,5 @@
+// File: Data/LibraryDbContext.cs
+
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using LibraryManagementSystem.Models;
@@ -49,7 +51,6 @@ namespace LibraryManagementSystem.Data
                     await userManager.AddToRoleAsync(adminUser, "Admin");
                 }
             }
-          }
-
         }
+    }
 }

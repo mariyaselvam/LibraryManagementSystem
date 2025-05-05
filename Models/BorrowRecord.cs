@@ -8,10 +8,10 @@ namespace LibraryManagementSystem.Models
         public int Id { get; set; }
 
         [Required]
-        public int UserId { get; set; }
+        public string UserId { get; set; }
 
         [ForeignKey("UserId")]
-        public User User { get; set; }
+        public ApplicationUser User { get; set; }
 
         [Required]
         public int BookId { get; set; }
@@ -19,8 +19,14 @@ namespace LibraryManagementSystem.Models
         [ForeignKey("BookId")]
         public Book Book { get; set; }
 
-        public DateTime BorrowedOn { get; set; }
-        public DateTime DueDate { get; set; }
-        public DateTime? ReturnedOn { get; set; }
+        public DateTime BorrowDate { get; set; } = DateTime.UtcNow;
+
+        public DateTime DueDate { get; set; } = DateTime.UtcNow.AddDays(14);
+
+        public DateTime? ReturnDate { get; set; }
+
+        public bool IsReturned { get; set; } = false;
+
+        public decimal? LateFee { get; set; }
     }
 }

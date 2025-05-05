@@ -1,4 +1,7 @@
-public class BorrowCreateDto
+namespace LibraryManagementSystem.DTOs.Borrow
 {
-    public int BookId { get; set; }
+    public class BorrowCreateDto
+    {
+        public int BookId { get; set; }
+    }
 }

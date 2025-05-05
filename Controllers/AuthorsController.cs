@@ -21,24 +21,6 @@ namespace LibraryManagementSystem.Controllers
             _mapper = mapper;
         }
 
-        // ? Publicly accessible - any authenticated user
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> GetAllAuthors()
-        {
-            try
-            {
-                var authors = await _authorRepository.GetAllAsync();
-                var authorDtos = _mapper.Map<IEnumerable<AuthorDto>>(authors);
-                return Ok(authorDtos);
-            }
-            catch (DbUpdateException ex)
-            {
-                return StatusCode(500, $"Internal server error: {ex.Message}");
-            }
-        }
-
-        // ? Only Admins can create authors
         [HttpPost]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateAuthor([FromBody] AuthorCreateDTO authorCreateDTO)
@@ -126,5 +108,23 @@ namespace LibraryManagementSystem.Controllers
                 return StatusCode(500, $"Internal server error: {ex.Message}");
             }
         }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetAllAuthors([FromQuery] bool includeDeleted = false)
+        {
+            try
+            {
+                var authors = await _authorRepository.GetAllAsync(includeDeleted);
+                var authorDtos = _mapper.Map<IEnumerable<AuthorDto>>(authors);
+                return Ok(authorDtos);
+            }
+            catch (DbUpdateException ex)
+            {
+                return StatusCode(500, $"Internal server error: {ex.Message}");
+            }
+        }
+
+
     }
 }

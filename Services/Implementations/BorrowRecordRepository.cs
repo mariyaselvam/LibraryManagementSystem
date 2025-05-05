@@ -1,7 +1,9 @@
-using LibraryManagementSystem.Data;
-using LibraryManagementSystem.Models;
-using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using LibraryManagementSystem.Data;
+using LibraryManagementSystem.DTOs.Borrow;
+using LibraryManagementSystem.Models;
+using LibraryManagementSystem.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 public class BorrowRecordRepository : IBorrowRecordRepository
 {
@@ -16,50 +18,41 @@ public class BorrowRecordRepository : IBorrowRecordRepository
 
     public async Task<BorrowReadDto> BorrowBookAsync(string userId, int bookId)
     {
-        // Convert string userId to int if needed
-        if (!int.TryParse(userId, out int userIdInt))
-            throw new Exception("Invalid user ID format.");
-
-        var borrowRecord = new BorrowRecord
+        var borrow = new BorrowRecord
         {
-            UserId = userIdInt,
-            BookId = bookId,
-            // Commenting out if not in model
-            // BorrowDate = DateTime.UtcNow
+            UserId = userId,
+            BookId = bookId
         };
 
-        _context.BorrowRecords.Add(borrowRecord);
+        _context.BorrowRecords.Add(borrow);
         await _context.SaveChangesAsync();
 
-        var savedRecord = await _context.BorrowRecords
+        var borrowWithBook = await _context.BorrowRecords
             .Include(b => b.Book)
-            .FirstOrDefaultAsync(b => b.Id == borrowRecord.Id);
+            .FirstOrDefaultAsync(b => b.Id == borrow.Id);
 
-        return _mapper.Map<BorrowReadDto>(savedRecord);
+        return _mapper.Map<BorrowReadDto>(borrowWithBook);
     }
 
-    public async Task<bool> ReturnBookAsync(int borrowRecordId)
+    public async Task<bool> ReturnBookAsync(int borrowId)
     {
-        var record = await _context.BorrowRecords.FindAsync(borrowRecordId);
-        if (record == null)
-            throw new Exception("Book not found.");
+        var borrow = await _context.BorrowRecords.FindAsync(borrowId);
+        if (borrow == null || borrow.IsReturned) return false;
 
-        // Only update if those properties exist in the model
-        // record.IsReturned = true;
-        // record.ReturnDate = DateTime.UtcNow;
-
+        borrow.IsReturned = true;
+        borrow.ReturnDate = DateTime.UtcNow;
         await _context.SaveChangesAsync();
         return true;
     }
 
-    public async Task<IEnumerable<BorrowRecord>> GetUserBorrowHistoryAsync(string userId)
+    public async Task<IEnumerable<BorrowReadDto>> GetUserBorrowHistoryAsync(string userId)
     {
-        if (!int.TryParse(userId, out int userIdInt))
-            throw new Exception("Invalid user ID.");
-
-        return await _context.BorrowRecords
-            .Where(r => r.UserId == userIdInt)
-            //.OrderByDescending(r => r.BorrowDate)  // Skip if BorrowDate doesn't exist
+        var records = await _context.BorrowRecords
+            .Where(r => r.UserId == userId)
+            .Include(r => r.Book)
+            .OrderByDescending(r => r.BorrowDate)
             .ToListAsync();
+
+        return _mapper.Map<IEnumerable<BorrowReadDto>>(records);
     }
 }

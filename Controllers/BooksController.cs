@@ -23,12 +23,13 @@ namespace LibraryManagementSystem.Controllers
 
         // GET: api/books
         [HttpGet]
-        [AllowAnonymous]
-        public async Task<IActionResult> GetAllBooks()
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> GetAllBooks([FromQuery] bool includeDeleted = false)
         {
-            var books = await _bookRepository.GetAllAsync();
+            var books = await _bookRepository.GetAllAsync(includeDeleted);
             return Ok(books);
         }
+
 
         // POST: api/books
         [HttpPost]
@@ -42,7 +43,7 @@ namespace LibraryManagementSystem.Controllers
 
         // GET: api/books/{id}
         [HttpGet("{id}")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> GetById(int id)
         {
             var book = await _bookRepository.GetByIdAsync(id);

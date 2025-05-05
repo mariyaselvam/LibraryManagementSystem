@@ -1,49 +1,50 @@
-using AutoMapper;
+using LibraryManagementSystem.DTOs.Borrow;
+using LibraryManagementSystem.Models;
+using LibraryManagementSystem.Services.Interfaces; // ?
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
 namespace LibraryManagementSystem.Controllers
 {
+    [Authorize]
     [ApiController]
     [Route("api/[controller]")]
-    [Authorize]
     public class BorrowController : ControllerBase
     {
-        private readonly IBorrowRecordRepository _repo;
-        private readonly IMapper _mapper;
+        private readonly IBorrowRecordRepository _borrowRepo;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public BorrowController(IBorrowRecordRepository repo, IMapper mapper)
+        public BorrowController(IBorrowRecordRepository borrowRepo, UserManager<ApplicationUser> userManager)
         {
-            _repo = repo;
-            _mapper = mapper;
+            _borrowRepo = borrowRepo;
+            _userManager = userManager;
         }
 
-        [HttpPost]
-        public async Task<IActionResult> BorrowBook(BorrowCreateDto dto)
+        [HttpPost("borrow")]
+        public async Task<IActionResult> BorrowBook([FromBody] BorrowCreateDto dto)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                ?? User.FindFirst("sub")?.Value;
-
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized("User ID not found in token");
-
-            var record = await _repo.BorrowBookAsync(userId, dto.BookId);  // Change repo method to accept string
-            return Ok(_mapper.Map<BorrowReadDto>(record));
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var result = await _borrowRepo.BorrowBookAsync(userId, dto.BookId);
+            return Ok(result);
         }
 
-        [HttpGet("history")]
-        public async Task<IActionResult> GetHistory()
+        [HttpPost("return/{id}")]
+        public async Task<IActionResult> ReturnBook(int id)
         {
-            string userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
-            if (string.IsNullOrEmpty(userId))
-                return Unauthorized("User ID not found in token");
-
-            var records = await _repo.GetUserBorrowHistoryAsync(userId);  // Change repo method to accept string
-            return Ok(_mapper.Map<IEnumerable<BorrowReadDto>>(records));
+            var success = await _borrowRepo.ReturnBookAsync(id);
+            if (!success) return NotFound();
+            return Ok();
         }
 
+        [HttpGet("my-history")]
+        public async Task<IActionResult> GetMyBorrowHistory()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var history = await _borrowRepo.GetUserBorrowHistoryAsync(userId);
+            return Ok(history);
+        }
     }
 
 }

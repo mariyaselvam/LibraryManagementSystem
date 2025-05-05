@@ -1,8 +1,8 @@
-using LibraryManagementSystem.Models;
+using LibraryManagementSystem.DTOs.Borrow;
 
 public interface IBorrowRecordRepository
 {
-    Task<BorrowReadDto> BorrowBookAsync(string userId, int bookId); // Change return type to BorrowReadDto
-    Task<bool> ReturnBookAsync(int borrowRecordId);
-    Task<IEnumerable<BorrowRecord>> GetUserBorrowHistoryAsync(string userId);
+    Task<BorrowReadDto> BorrowBookAsync(string userId, int bookId);
+    Task<bool> ReturnBookAsync(int borrowId);
+    Task<IEnumerable<BorrowReadDto>> GetUserBorrowHistoryAsync(string userId);
 }

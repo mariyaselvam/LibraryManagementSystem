@@ -122,6 +122,7 @@ using (var scope = app.Services.CreateScope())
     await LibraryDbContext.SeedAsync(context, userManager, roleManager);
 }
 
+
 app.UseCors("AllowAllOrigins");
 
 if (app.Environment.IsDevelopment())

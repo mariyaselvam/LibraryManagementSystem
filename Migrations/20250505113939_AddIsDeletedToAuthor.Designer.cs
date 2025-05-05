@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LibraryManagementSystem.Migrations
 {
     [DbContext(typeof(LibraryDbContext))]
-    [Migration("20250504054107_AddGenresTable")]
-    partial class AddGenresTable
+    [Migration("20250505113939_AddIsDeletedToAuthor")]
+    partial class AddIsDeletedToAuthor
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,30 @@ namespace LibraryManagementSystem.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("Author", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("DateOfBirth")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Authors");
+                });
 
             modelBuilder.Entity("LibraryManagementSystem.Models.ApplicationUser", b =>
                 {
@@ -94,27 +118,6 @@ namespace LibraryManagementSystem.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("LibraryManagementSystem.Models.Author", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("DateOfBirth")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("Authors");
-                });
-
             modelBuilder.Entity("LibraryManagementSystem.Models.Book", b =>
                 {
                     b.Property<int>("Id")
@@ -161,31 +164,38 @@ namespace LibraryManagementSystem.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
                     b.Property<int>("BookId")
                         .HasColumnType("int");
 
-                    b.Property<DateTime>("BorrowedOn")
+                    b.Property<DateTime>("BorrowDate")
                         .HasColumnType("datetime2");
 
                     b.Property<DateTime>("DueDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<DateTime?>("ReturnedOn")
+                    b.Property<bool>("IsReturned")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal?>("LateFee")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<DateTime?>("ReturnDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserId")
+                    b.Property<string>("UserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
+                    b.Property<int?>("UserId1")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ApplicationUserId");
-
                     b.HasIndex("BookId");
 
                     b.HasIndex("UserId");
+
+                    b.HasIndex("UserId1");
 
                     b.ToTable("BorrowRecords");
                 });
@@ -368,7 +378,7 @@ namespace LibraryManagementSystem.Migrations
 
             modelBuilder.Entity("LibraryManagementSystem.Models.Book", b =>
                 {
-                    b.HasOne("LibraryManagementSystem.Models.Author", "Author")
+                    b.HasOne("Author", "Author")
                         .WithMany("Books")
                         .HasForeignKey("AuthorId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -387,21 +397,21 @@ namespace LibraryManagementSystem.Migrations
 
             modelBuilder.Entity("LibraryManagementSystem.Models.BorrowRecord", b =>
                 {
-                    b.HasOne("LibraryManagementSystem.Models.ApplicationUser", null)
-                        .WithMany("BorrowRecords")
-                        .HasForeignKey("ApplicationUserId");
-
                     b.HasOne("LibraryManagementSystem.Models.Book", "Book")
                         .WithMany("BorrowRecords")
                         .HasForeignKey("BookId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("LibraryManagementSystem.Models.User", "User")
+                    b.HasOne("LibraryManagementSystem.Models.ApplicationUser", "User")
                         .WithMany("BorrowRecords")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("LibraryManagementSystem.Models.User", null)
+                        .WithMany("BorrowRecords")
+                        .HasForeignKey("UserId1");
 
                     b.Navigation("Book");
 
@@ -459,14 +469,14 @@ namespace LibraryManagementSystem.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("Author", b =>
+                {
+                    b.Navigation("Books");
+                });
+
             modelBuilder.Entity("LibraryManagementSystem.Models.ApplicationUser", b =>
                 {
                     b.Navigation("BorrowRecords");
-                });
-
-            modelBuilder.Entity("LibraryManagementSystem.Models.Author", b =>
-                {
-                    b.Navigation("Books");
                 });
 
             modelBuilder.Entity("LibraryManagementSystem.Models.Book", b =>

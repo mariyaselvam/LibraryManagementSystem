@@ -17,13 +17,20 @@ namespace LibraryManagementSystem.Services.Implementations
         // Fetch a book by ID along with its Author
         public async Task<Book> GetByIdAsync(int id)
         {
-            return await _context.Books.Include(b => b.Author).FirstOrDefaultAsync(b => b.Id == id);
+            return await _context.Books
+                .Include(b => b.Author)
+                .FirstOrDefaultAsync(b => b.Id == id && !b.IsDeleted);
         }
 
+
         // Fetch all books
-        public async Task<IEnumerable<Book>> GetAllAsync()
+        public async Task<IEnumerable<Book>> GetAllAsync(bool includeDeleted = false)
         {
-            return await _context.Books.Include(b => b.Author).ToListAsync();
+            var query = _context.Books.Include(b => b.Author).AsQueryable();
+            if (!includeDeleted)
+                query = query.Where(b => !b.IsDeleted);
+
+            return await query.ToListAsync();
         }
 
         // Add a new book to the database
@@ -46,11 +53,13 @@ namespace LibraryManagementSystem.Services.Implementations
         public async Task<bool> DeleteAsync(int id)
         {
             var book = await _context.Books.FindAsync(id);
-            if (book == null) return false;
+            if (book == null || book.IsDeleted) return false;
 
-            _context.Books.Remove(book);
+            book.IsDeleted = true;
+            _context.Books.Update(book);
             await _context.SaveChangesAsync();
             return true;
         }
+
     }
 }

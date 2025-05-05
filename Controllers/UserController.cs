@@ -7,7 +7,7 @@ namespace LibraryManagementSystem.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize] // Only authenticated users can access the controller
     public class UserController : ControllerBase
     {
         private readonly IUserRepository _userRepo;
@@ -17,6 +17,7 @@ namespace LibraryManagementSystem.Controllers
             _userRepo = userRepo;
         }
 
+        // ? Only Admins can view all users
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUsers()
@@ -25,12 +26,15 @@ namespace LibraryManagementSystem.Controllers
             return Ok(users);
         }
 
+        // ? Only Admins can create new users
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateUser([FromBody] UserCreateDto dto)
         {
             var result = await _userRepo.CreateUserAsync(dto);
             if (result == null)
                 return BadRequest("Username already exists.");
+
             return CreatedAtAction(nameof(GetAllUsers), new { id = result.Id }, result);
         }
     }
