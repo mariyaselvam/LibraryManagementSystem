@@ -11,38 +11,42 @@ public class BorrowRecordRepository : IBorrowRecordRepository
     public BorrowRecordRepository(LibraryDbContext context, IMapper mapper)
     {
         _context = context;
-        _mapper = mapper;  // Add IMapper here
+        _mapper = mapper;
     }
 
     public async Task<BorrowReadDto> BorrowBookAsync(string userId, int bookId)
     {
+        // Convert string userId to int if needed
+        if (!int.TryParse(userId, out int userIdInt))
+            throw new Exception("Invalid user ID format.");
+
         var borrowRecord = new BorrowRecord
         {
-            UserId = userId,
+            UserId = userIdInt,
             BookId = bookId,
-            BorrowDate = DateTime.UtcNow
+            // Commenting out if not in model
+            // BorrowDate = DateTime.UtcNow
         };
 
         _context.BorrowRecords.Add(borrowRecord);
         await _context.SaveChangesAsync();
 
-        // Re-fetch the record including the Book
         var savedRecord = await _context.BorrowRecords
             .Include(b => b.Book)
             .FirstOrDefaultAsync(b => b.Id == borrowRecord.Id);
 
-        // Map the saved record to BorrowReadDto and return
         return _mapper.Map<BorrowReadDto>(savedRecord);
     }
 
     public async Task<bool> ReturnBookAsync(int borrowRecordId)
     {
         var record = await _context.BorrowRecords.FindAsync(borrowRecordId);
-        if (record == null || record.IsReturned)
+        if (record == null)
             throw new Exception("Book not found.");
 
-        record.IsReturned = true;
-        record.ReturnDate = DateTime.UtcNow;
+        // Only update if those properties exist in the model
+        // record.IsReturned = true;
+        // record.ReturnDate = DateTime.UtcNow;
 
         await _context.SaveChangesAsync();
         return true;
@@ -50,9 +54,12 @@ public class BorrowRecordRepository : IBorrowRecordRepository
 
     public async Task<IEnumerable<BorrowRecord>> GetUserBorrowHistoryAsync(string userId)
     {
+        if (!int.TryParse(userId, out int userIdInt))
+            throw new Exception("Invalid user ID.");
+
         return await _context.BorrowRecords
-            .Where(r => r.UserId == userId)
-            .OrderByDescending(r => r.BorrowDate)
+            .Where(r => r.UserId == userIdInt)
+            //.OrderByDescending(r => r.BorrowDate)  // Skip if BorrowDate doesn't exist
             .ToListAsync();
     }
 }

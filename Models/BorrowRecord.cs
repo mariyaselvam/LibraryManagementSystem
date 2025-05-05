@@ -5,23 +5,22 @@ namespace LibraryManagementSystem.Models
 {
     public class BorrowRecord
     {
-        [Key]
         public int Id { get; set; }
 
         [Required]
-        [ForeignKey("User")]
-        public string UserId { get; set; }
+        public int UserId { get; set; }
+
+        [ForeignKey("UserId")]
+        public User User { get; set; }
 
         [Required]
-        [ForeignKey("Book")]
         public int BookId { get; set; }
 
-        public DateTime BorrowDate { get; set; }
-        public DateTime? ReturnDate { get; set; }
-        public bool IsReturned { get; set; }
-
-        // Navigation properties
-        public ApplicationUser User { get; set; }
+        [ForeignKey("BookId")]
         public Book Book { get; set; }
+
+        public DateTime BorrowedOn { get; set; }
+        public DateTime DueDate { get; set; }
+        public DateTime? ReturnedOn { get; set; }
     }
 }

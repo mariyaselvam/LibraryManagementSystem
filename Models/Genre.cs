@@ -1,9 +1,8 @@
 using System.ComponentModel.DataAnnotations;
-using System.Text.Json.Serialization;
 
 namespace LibraryManagementSystem.Models
 {
-    public class Author
+    public class Genre
     {
         public int Id { get; set; }
 
@@ -11,9 +10,7 @@ namespace LibraryManagementSystem.Models
         [MaxLength(100)]
         public string Name { get; set; }
 
-        public DateTime DateOfBirth { get; set; }
-
-        [JsonIgnore]
+        // Navigation Property
         public List<Book> Books { get; set; } = new();
     }
 }

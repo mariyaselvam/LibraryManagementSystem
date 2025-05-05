@@ -5442,11 +5442,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\anthu\\source\\repos\\task_two\\LibraryManagementSystem\\LibraryManagementSystem.csproj",
+      "projectUniqueName": "C:\\Users\\anthu\\Downloads\\LibraryManagementSystem-2 - Copy\\LibraryManagementSystem\\LibraryManagementSystem.csproj",
       "projectName": "LibraryManagementSystem",
-      "projectPath": "C:\\Users\\anthu\\source\\repos\\task_two\\LibraryManagementSystem\\LibraryManagementSystem.csproj",
+      "projectPath": "C:\\Users\\anthu\\Downloads\\LibraryManagementSystem-2 - Copy\\LibraryManagementSystem\\LibraryManagementSystem.csproj",
       "packagesPath": "C:\\Users\\anthu\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\anthu\\source\\repos\\task_two\\LibraryManagementSystem\\obj\\",
+      "outputPath": "C:\\Users\\anthu\\Downloads\\LibraryManagementSystem-2 - Copy\\LibraryManagementSystem\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

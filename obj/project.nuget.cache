@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "6s46tG4/2II=",
+  "dgSpecHash": "jZtUkQd42ng=",
   "success": true,
-  "projectFilePath": "C:\\Users\\anthu\\source\\repos\\task_two\\LibraryManagementSystem\\LibraryManagementSystem.csproj",
+  "projectFilePath": "C:\\Users\\anthu\\Downloads\\LibraryManagementSystem-2 - Copy\\LibraryManagementSystem\\LibraryManagementSystem.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\anthu\\.nuget\\packages\\automapper\\12.0.1\\automapper.12.0.1.nupkg.sha512",
     "C:\\Users\\anthu\\.nuget\\packages\\automapper.extensions.microsoft.dependencyinjection\\12.0.1\\automapper.extensions.microsoft.dependencyinjection.12.0.1.nupkg.sha512",

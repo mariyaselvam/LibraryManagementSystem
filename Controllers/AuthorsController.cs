@@ -1,8 +1,10 @@
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using LibraryManagementSystem.DTOs.Author;
+using LibraryManagementSystem.Models;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace LibraryManagementSystem.Controllers
 {
@@ -19,14 +21,15 @@ namespace LibraryManagementSystem.Controllers
             _mapper = mapper;
         }
 
-        // Get all authors
+        // ? Publicly accessible - any authenticated user
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> GetAllAuthors()
         {
             try
             {
                 var authors = await _authorRepository.GetAllAsync();
-                var authorDtos = _mapper.Map<IEnumerable<AuthorDto>>(authors); // Mapping Author to AuthorDto
+                var authorDtos = _mapper.Map<IEnumerable<AuthorDto>>(authors);
                 return Ok(authorDtos);
             }
             catch (DbUpdateException ex)
@@ -35,20 +38,19 @@ namespace LibraryManagementSystem.Controllers
             }
         }
 
-        // Create a new author
+        // ? Only Admins can create authors
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateAuthor([FromBody] AuthorCreateDTO authorCreateDTO)
         {
             if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);  // Return validation errors
-            }
+                return BadRequest(ModelState);
 
             try
             {
-                var author = _mapper.Map<Author>(authorCreateDTO);  // Map CreateDTO to Author
+                var author = _mapper.Map<Author>(authorCreateDTO);
                 var createdAuthor = await _authorRepository.AddAsync(author);
-                var createdAuthorDto = _mapper.Map<AuthorDto>(createdAuthor);  // Map the created author to AuthorDto
+                var createdAuthorDto = _mapper.Map<AuthorDto>(createdAuthor);
                 return CreatedAtAction(nameof(GetById), new { id = createdAuthorDto.Id }, createdAuthorDto);
             }
             catch (DbUpdateException ex)
@@ -57,19 +59,18 @@ namespace LibraryManagementSystem.Controllers
             }
         }
 
-        // Get author by Id
+        // ? Accessible to all authenticated users
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<IActionResult> GetById(int id)
         {
             try
             {
                 var author = await _authorRepository.GetByIdAsync(id);
                 if (author == null)
-                {
-                    return NotFound();  // Return 404 if author doesn't exist
-                }
+                    return NotFound();
 
-                var authorDto = _mapper.Map<AuthorDto>(author); // Map Author to AuthorDto
+                var authorDto = _mapper.Map<AuthorDto>(author);
                 return Ok(authorDto);
             }
             catch (DbUpdateException ex)
@@ -78,26 +79,23 @@ namespace LibraryManagementSystem.Controllers
             }
         }
 
-        // Update an existing author
+        // ? Only Admins can update authors
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateAuthor(int id, [FromBody] AuthorUpdateDTO authorUpdateDTO)
         {
             if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);  // Return validation errors
-            }
+                return BadRequest(ModelState);
 
             try
             {
                 var existingAuthor = await _authorRepository.GetByIdAsync(id);
                 if (existingAuthor == null)
-                {
-                    return NotFound();  // Return 404 if author doesn't exist
-                }
+                    return NotFound();
 
-                _mapper.Map(authorUpdateDTO, existingAuthor); // Map AuthorUpdateDTO to existing Author
+                _mapper.Map(authorUpdateDTO, existingAuthor);
                 var updatedAuthor = await _authorRepository.UpdateAsync(existingAuthor);
-                var updatedAuthorDto = _mapper.Map<AuthorDto>(updatedAuthor); // Map the updated author to AuthorDto
+                var updatedAuthorDto = _mapper.Map<AuthorDto>(updatedAuthor);
                 return Ok(updatedAuthorDto);
             }
             catch (DbUpdateException ex)
@@ -106,27 +104,22 @@ namespace LibraryManagementSystem.Controllers
             }
         }
 
-        // Delete an author
+        // ? Only Admins can delete authors
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteAuthor(int id)
         {
             try
             {
                 var author = await _authorRepository.GetByIdAsync(id);
                 if (author == null)
-                {
-                    return NotFound();  // Return 404 if author doesn't exist
-                }
+                    return NotFound();
 
                 var isDeleted = await _authorRepository.DeleteAsync(id);
                 if (isDeleted)
-                {
-                    return NoContent();  // HTTP 204 No Content indicates successful deletion
-                }
+                    return NoContent();
                 else
-                {
                     return BadRequest("Failed to delete the author.");
-                }
             }
             catch (DbUpdateException ex)
             {

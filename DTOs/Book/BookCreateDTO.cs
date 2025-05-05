@@ -1,10 +1,20 @@
-namespace LibraryManagementSystem.DTOs.Book
+using System.ComponentModel.DataAnnotations;
+
+public class BookCreateDTO
 {
-    public class BookCreateDTO
-    {
-        public string Title { get; set; }
-        public int AuthorId { get; set; }  // Foreign key to Author
-        public string ISBN { get; set; }
-        public DateTime PublishDate { get; set; }  // Add PublishDate property
-    }
+    [Required]
+    public string Title { get; set; }
+
+    [Required]
+    public int AuthorId { get; set; }
+
+    [Required]
+    public int GenreId { get; set; }
+
+    [Required]
+    [StringLength(13)]
+    public string ISBN { get; set; }
+
+    [Required]
+    public DateTime PublishedDate { get; set; }  // Match name with model
 }
