@@ -14,15 +14,17 @@ namespace LibraryManagementSystem.Models
         public string PasswordHash { get; set; }
 
         [Required]
-        public UserRole Role { get; set; }
+        public UserRole Role { get; set; } // This stores the role of the user (Admin, Staff, User)
 
-        // Navigation property to BorrowRecords
         public List<BorrowRecord> BorrowRecords { get; set; } = new();
     }
+
 
     public enum UserRole
     {
         Admin,
-        Staff
+        Staff,
+        User
     }
+
 }

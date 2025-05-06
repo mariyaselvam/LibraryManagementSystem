@@ -50,16 +50,16 @@ namespace LibraryManagementSystem.Services.Implementations
         }
 
         // Delete a book from the database
-        public async Task<bool> DeleteAsync(int id)
-        {
-            var book = await _context.Books.FindAsync(id);
-            if (book == null || book.IsDeleted) return false;
+       public async Task<bool> DeleteAsync(int id)
+{
+    var book = await _context.Books.FindAsync(id);
+    if (book == null || book.IsDeleted) return false;
 
-            book.IsDeleted = true;
-            _context.Books.Update(book);
-            await _context.SaveChangesAsync();
-            return true;
-        }
+    book.IsDeleted = true;
+    _context.Books.Update(book);
+    await _context.SaveChangesAsync();
+    return true;
+}
 
     }
 }

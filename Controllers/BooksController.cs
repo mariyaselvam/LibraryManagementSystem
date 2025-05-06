@@ -4,6 +4,8 @@ using LibraryManagementSystem.Models;
 using Microsoft.AspNetCore.Mvc;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
+using LibraryManagementSystem.Data;
 
 namespace LibraryManagementSystem.Controllers
 {
@@ -13,12 +15,14 @@ namespace LibraryManagementSystem.Controllers
     public class BooksController : ControllerBase
     {
         private readonly IBookRepository _bookRepository;
+        private readonly LibraryDbContext _context;
         private readonly IMapper _mapper;
 
-        public BooksController(IBookRepository bookRepository, IMapper mapper)
+        public BooksController(IBookRepository bookRepository, IMapper mapper, LibraryDbContext context)
         {
             _bookRepository = bookRepository;
             _mapper = mapper;
+            _context = context;
         }
 
         // GET: api/books
@@ -27,7 +31,9 @@ namespace LibraryManagementSystem.Controllers
         public async Task<IActionResult> GetAllBooks([FromQuery] bool includeDeleted = false)
         {
             var books = await _bookRepository.GetAllAsync(includeDeleted);
-            return Ok(books);
+            var bookDtos = _mapper.Map<IEnumerable<BookResponseDTO>>(books);
+
+            return Ok(bookDtos);
         }
 
 
@@ -36,10 +42,26 @@ namespace LibraryManagementSystem.Controllers
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateBook([FromBody] BookCreateDTO bookCreateDTO)
         {
+            // Check if Author exists
+            var authorExists = await _context.Authors.AnyAsync(a => a.Id == bookCreateDTO.AuthorId);
+            if (!authorExists)
+            {
+                return NotFound($"Author with ID {bookCreateDTO.AuthorId} not found.");
+            }
+
+            // Check if Genre exists
+            var genreExists = await _context.Genres.AnyAsync(g => g.Id == bookCreateDTO.GenreId);
+            if (!genreExists)
+            {
+                return NotFound($"Genre with ID {bookCreateDTO.GenreId} not found.");
+            }
+
+            // Create and save the book
             var book = _mapper.Map<Book>(bookCreateDTO);
             var createdBook = await _bookRepository.AddAsync(book);
             return CreatedAtAction(nameof(GetById), new { id = createdBook.Id }, createdBook);
         }
+
 
         // GET: api/books/{id}
         [HttpGet("{id}")]
@@ -82,5 +104,9 @@ namespace LibraryManagementSystem.Controllers
             var isDeleted = await _bookRepository.DeleteAsync(id);
             return isDeleted ? NoContent() : BadRequest("Failed to delete the book.");
         }
+
+
     }
+
+
 }

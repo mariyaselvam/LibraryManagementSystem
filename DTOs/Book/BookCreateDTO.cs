@@ -16,5 +16,8 @@ public class BookCreateDTO
     public string ISBN { get; set; }
 
     [Required]
+    public int AvailableCopies { get; set; }
+
+    [Required]
     public DateTime PublishedDate { get; set; }  // Match name with model
 }

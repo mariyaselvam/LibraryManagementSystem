@@ -1,6 +1,7 @@
 using AutoMapper;
 using LibraryManagementSystem.Data;
 using LibraryManagementSystem.DTOs.Borrow;
+using LibraryManagementSystem.DTOs.Reports;
 using LibraryManagementSystem.Models;
 using LibraryManagementSystem.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -55,4 +56,31 @@ public class BorrowRecordRepository : IBorrowRecordRepository
 
         return _mapper.Map<IEnumerable<BorrowReadDto>>(records);
     }
+
+    public async Task<List<TopBookDto>> GetTopBorrowedBooksAsync()
+    {
+        var grouped = await _context.BorrowRecords
+            .Include(br => br.Book)
+                .ThenInclude(b => b.Author)
+            .GroupBy(br => br.Book)
+            .Select(g => new
+            {
+                Book = g.Key,
+                BorrowCount = g.Count()
+            })
+            .OrderByDescending(x => x.BorrowCount)
+            .Take(5)
+            .ToListAsync();
+
+        // Map books and manually assign BorrowCount
+        var topBooks = _mapper.Map<List<TopBookDto>>(grouped.Select(x => x.Book).ToList());
+
+        for (int i = 0; i < topBooks.Count; i++)
+        {
+            topBooks[i].BorrowCount = grouped[i].BorrowCount;
+        }
+
+        return topBooks;
+    }
+
 }
